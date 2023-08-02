@@ -73,4 +73,3 @@ async function generateLogo() {
 
 generateLogo();
 
-module.exports = generateLogo;
