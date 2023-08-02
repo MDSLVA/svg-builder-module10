@@ -1,16 +1,15 @@
 const fs = require('fs');
 const { prompt } = require('enquirer');
-const { Circle, Triangle, Square } = require('./lib/shapes');
 
-function generateSVG({ text, textColor, shape, shapeColor }) {
+function generateSVG({ text, textColor, backgroundColor, shape, shapeColor }) {
   let svgContent = `<svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
-  <rect x="0" y="0" width="100%" height="100%" fill="${shapeColor}" />`;
+  <rect x="0" y="0" width="100%" height="100%" fill="${backgroundColor}" />`;
 
   const shapeProps = {
     cx: 150,
     cy: 100,
     r: 50,
-    fill: textColor,
+    fill: shapeColor,
   };
 
   switch (shape) {
@@ -24,8 +23,7 @@ function generateSVG({ text, textColor, shape, shapeColor }) {
       svgContent += `<rect x="${shapeProps.cx - shapeProps.r}" y="${shapeProps.cy - shapeProps.r}" width="${shapeProps.r * 2}" height="${shapeProps.r * 2}" fill="${shapeProps.fill}" />`;
       break;
     default:
-      console.log('Invalid shape choice.');
-      return null;
+      throw new Error('Invalid shape choice.');
   }
 
   svgContent += `<text x="150" y="110" text-anchor="middle" font-size="30" fill="${textColor}">${text}</text>
@@ -47,6 +45,11 @@ async function generateLogo() {
       message: 'Enter text color (keyword or hexadecimal):',
     },
     {
+      type: 'input',
+      name: 'backgroundColor',
+      message: 'Enter background color (keyword or hexadecimal):',
+    },
+    {
       type: 'select',
       name: 'shape',
       message: 'Choose a shape:',
@@ -59,8 +62,8 @@ async function generateLogo() {
     },
   ]);
 
-  const { text, textColor, shape, shapeColor } = response;
-  const svgContent = generateSVG({ text, textColor, shape, shapeColor });
+  const { text, textColor, backgroundColor, shape, shapeColor } = response;
+  const svgContent = generateSVG({ text, textColor, backgroundColor, shape, shapeColor });
 
   if (svgContent) {
     fs.writeFileSync('logo.svg', svgContent);
